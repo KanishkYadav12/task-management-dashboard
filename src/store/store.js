@@ -11,3 +11,13 @@ export const store = configureStore({
       serializableCheck: false,
     }),
 });
+
+// Sync Redux state with localStorage on every change
+store.subscribe(() => {
+  const state = store.getState();
+  // Save tasks array to localStorage whenever it changes
+  localStorage.setItem(
+    "tasks_data",
+    JSON.stringify(state.tasks.tasks)
+  );
+});

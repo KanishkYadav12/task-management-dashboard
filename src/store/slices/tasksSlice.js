@@ -1,6 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { taskAPI } from "../../services/api";
 
+// Initialize tasks from localStorage
+const initializeTasks = () => {
+  try {
+    const saved = localStorage.getItem("tasks_data");
+    return saved ? JSON.parse(saved) : [];
+  } catch (error) {
+    console.error("Error loading tasks from localStorage:", error);
+    return [];
+  }
+};
+
 /**
  * [3] Redux Async Thunks - Dispatch API calls
  * These handle the async operations and dispatch actions
@@ -62,7 +73,7 @@ export const deleteTaskAsync = createAsyncThunk(
 const tasksSlice = createSlice({
   name: "tasks",
   initialState: {
-    tasks: [],
+    tasks: initializeTasks(), // Load from localStorage on init
     loading: false,
     error: null,
     filter: "all", // 'all' | 'completed' | 'pending'

@@ -1,56 +1,55 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:3001";
-
 /**
- * [4] API Layer - Axios HTTP Client
- * All API calls go through this service
+ * [4] API Layer - localStorage Mock Service
+ * Uses localStorage for persistence + static mock data
+ * Perfect for frontend-only deployment without backend
  */
 
-// Create axios instance with default config
-const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  timeout: 5000,
-});
+// Static mock data
+const MOCK_TASKS = [
+  { id: 1, title: "Learn React Hooks", status: "Completed", createdAt: new Date().toISOString() },
+  { id: 2, title: "Master Redux Toolkit", status: "Completed", createdAt: new Date().toISOString() },
+  { id: 3, title: "Build Task Dashboard", status: "Completed", createdAt: new Date().toISOString() },
+  { id: 4, title: "Deploy to Vercel", status: "Completed", createdAt: new Date().toISOString() },
+  { id: 5, title: "Write Documentation", status: "Pending", createdAt: new Date().toISOString() },
+];
 
-// Request interceptor (for future auth tokens, etc.)
-apiClient.interceptors.request.use(
-  (config) => {
-    console.log(`[API Request] ${config.method.toUpperCase()} ${config.url}`);
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// Storage key
+const STORAGE_KEY = "tasks_data";
 
-// Response interceptor (for error handling)
-apiClient.interceptors.response.use(
-  (response) => {
-    console.log(`[API Response] ${response.status} - ${response.config.url}`);
-    return response;
-  },
-  (error) => {
-    console.error("[API Error]", error.message);
-    return Promise.reject(error);
+// Initialize localStorage with mock data if empty
+const initializeStorage = () => {
+  if (!localStorage.getItem(STORAGE_KEY)) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_TASKS));
   }
-);
+};
+
+// Get all tasks from localStorage
+const getTasks = () => {
+  initializeStorage();
+  const data = localStorage.getItem(STORAGE_KEY);
+  return JSON.parse(data || JSON.stringify(MOCK_TASKS));
+};
+
+// Save tasks to localStorage
+const saveTasks = (tasks) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+};
 
 /**
  * Task API Methods
- * [4] These make actual HTTP requests to JSON Server
+ * [4] These use localStorage for persistence
+ * Simulates backend delays for realistic UX
  */
 export const taskAPI = {
   /**
-   * Fetch all tasks from mock backend
+   * Fetch all tasks from localStorage
    * @returns {Promise<Array>} Array of tasks
    */
   fetchTasks: async () => {
-    const response = await apiClient.get("/tasks");
-    return response.data; // [7] Response data returned
+    // Simulate network delay
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    console.log("[API] Fetching tasks from localStorage");
+    return getTasks();
   },
 
   /**
@@ -59,11 +58,17 @@ export const taskAPI = {
    * @returns {Promise<Object>} Created task with id
    */
   addTask: async (task) => {
-    const response = await apiClient.post("/tasks", {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const tasks = getTasks();
+    const newTask = {
+      id: Date.now(), // Use timestamp as unique ID
       ...task,
       createdAt: new Date().toISOString(),
-    });
-    return response.data; // [7] Response data returned
+    };
+    tasks.push(newTask);
+    saveTasks(tasks);
+    console.log("[API] Task added:", newTask);
+    return newTask;
   },
 
   /**
@@ -73,8 +78,18 @@ export const taskAPI = {
    * @returns {Promise<Object>} Updated task
    */
   updateTask: async (id, updates) => {
-    const response = await apiClient.patch(`/tasks/${id}`, updates);
-    return response.data; // [7] Response data returned
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const tasks = getTasks();
+    const taskIndex = tasks.findIndex((t) => t.id === id);
+    
+    if (taskIndex === -1) {
+      throw new Error(`Task with id ${id} not found`);
+    }
+    
+    tasks[taskIndex] = { ...tasks[taskIndex], ...updates };
+    saveTasks(tasks);
+    console.log("[API] Task updated:", tasks[taskIndex]);
+    return tasks[taskIndex];
   },
 
   /**
@@ -83,7 +98,11 @@ export const taskAPI = {
    * @returns {Promise<string>} Deleted task ID
    */
   deleteTask: async (id) => {
-    await apiClient.delete(`/tasks/${id}`);
-    return id; // [7] Return ID for state update
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const tasks = getTasks();
+    const filteredTasks = tasks.filter((t) => t.id !== id);
+    saveTasks(filteredTasks);
+    console.log("[API] Task deleted with id:", id);
+    return id;
   },
 };
