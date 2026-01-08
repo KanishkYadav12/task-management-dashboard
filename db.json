@@ -1,0 +1,34 @@
+{
+  "tasks": [
+    {
+      "id": "2",
+      "title": "Configure Redux Toolkit store",
+      "status": "pending",
+      "createdAt": "2026-01-08T10:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "title": "Implement task CRUD operations",
+      "status": "pending",
+      "createdAt": "2026-01-08T11:00:00.000Z"
+    },
+    {
+      "id": "5",
+      "title": "Implement dark mode theme",
+      "status": "completed",
+      "createdAt": "2026-01-08T13:00:00.000Z"
+    },
+    {
+      "id": "f02b",
+      "title": "new task",
+      "status": "pending",
+      "createdAt": "2026-01-08T11:53:06.241Z"
+    },
+    {
+      "id": "156e",
+      "title": "sd",
+      "status": "pending",
+      "createdAt": "2026-01-08T12:21:06.482Z"
+    }
+  ]
+}
